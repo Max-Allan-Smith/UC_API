@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="UC_API.Application/UC_API.Application.csproj" />
+  <Project Path="UC_API.Domain/UC_API.Domain.csproj" />
+  <Project Path="UC_API.Infrastructure/UC_API.Infrastructure.csproj" />
+  <Project Path="UC_API.WebApi/UC_API.WebApi.csproj" />
+</Solution>
