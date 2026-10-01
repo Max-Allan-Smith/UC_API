@@ -54,9 +54,13 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddHealthChecks();
+
 builder.Services.AddOpenApi();
 
 WebApplication app = builder.Build();
+
+app.UseHealthChecks("/health");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
