@@ -5,6 +5,11 @@ using UC_API.Infrastructure.Products;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddWindowsService(options =>
+{
+    options.ServiceName = "UC API";
+});
+
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IProductRepository, InMemoryProductRepository>();
