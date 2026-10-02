@@ -1,9 +1,15 @@
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 using UC_API.Application.Products;
+using UC_API.Infrastructure;
 using UC_API.Infrastructure.Products;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Infrastructure
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddWindowsService(options => { options.ServiceName = "UC API"; });
 
 builder.Services.AddControllers();
 
@@ -15,24 +21,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });
-
-builder.Services.AddOpenIddict()
-    .AddValidation(options =>
-    {
-        options.SetIssuer("https://127.0.0.1:7214/");
-
-        options.AddAudiences("resource-api");
-
-        options
-            .UseIntrospection()
-            .SetClientId("resource-api")
-            .SetClientSecret(
-                builder.Configuration["Authentication:IntrospectionSecret"]!);
-
-        options.UseSystemNetHttp();
-
-        options.UseAspNetCore();
-    });
 
 builder.Services.AddAuthorization(options =>
 {
@@ -54,9 +42,13 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddHealthChecks();
+
 builder.Services.AddOpenApi();
 
 WebApplication app = builder.Build();
+
+app.UseHealthChecks("/health");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
