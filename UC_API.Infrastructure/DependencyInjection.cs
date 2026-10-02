@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using UC_API.Infrastructure.Persistence;
 
 namespace UC_API.Infrastructure
 {
@@ -7,6 +9,11 @@ namespace UC_API.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("Default"));
+            });
+
             return services;
         }
     }
