@@ -1,9 +1,13 @@
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 using UC_API.Application.Products;
+using UC_API.Infrastructure;
 using UC_API.Infrastructure.Products;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Infrastructure
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddWindowsService(options =>
 {

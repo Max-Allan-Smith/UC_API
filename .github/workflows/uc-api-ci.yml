@@ -1,0 +1,79 @@
+name: UC_API CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - 'feature/**'
+      - 'release/**'
+      - 'hotfix/**'
+    tags:
+      - 'v*.*.*'
+
+  pull_request:
+    branches:
+      - master
+      - develop
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  CONFIGURATION: Release
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # GitHub's tag glob cannot strictly enforce numeric SemVer,
+      # so validate vX.Y.Z here.
+      - name: Validate release tag
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid release tag: $TAG"
+            echo "Expected format: vX.Y.Z (example: v1.4.2)"
+            exit 1
+          fi
+
+          VERSION="${TAG#v}"
+
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Release version: $VERSION"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        run: dotnet build --no-restore --configuration ${{ env.CONFIGURATION }}
+
+      - name: Build tagged release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: >
+          dotnet build
+          --no-restore
+          --configuration ${{ env.CONFIGURATION }}
+          -p:Version=${{ env.VERSION }}
+
+      - name: Test
+        run: >
+          dotnet test
+          --no-build
+          --configuration ${{ env.CONFIGURATION }}
+          --verbosity normal
