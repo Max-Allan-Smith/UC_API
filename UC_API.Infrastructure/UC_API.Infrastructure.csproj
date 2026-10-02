@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\UC_API.Application\UC_API.Application.csproj" />
     <ProjectReference Include="..\UC_API.Domain\UC_API.Domain.csproj" />
   </ItemGroup>
